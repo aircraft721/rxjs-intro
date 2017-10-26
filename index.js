@@ -698,3 +698,53 @@ const rootEpic = combineEpics(
 */
 
 
+/* HOW TO SETUP THE STORE WITH REDUCERS AND EPICS
+
+
+//import all epics into a single file which then export the root epic and the root reducer
+
+import {combineEpics} from 'redux-observable';
+import {combineReducers} from 'redux';
+import reducer1, {epic1} from '../blabla/epic';
+import reducer2, {epic2} from '../blabla/epic2';
+
+export const rootEpic = combineEpics(
+    epic1,
+    epic2
+)
+
+export const rootReducer = combineReducers({
+    reducer1,
+    reducer2
+})
+
+//after that import 
+import {createEpicMiddleware} from 'redux-observable';
+import {rootEpic} from '../up';
+
+const epicMiddleware = createEpicMiddleware(rootEpic);
+
+export default function configureStore(){
+    const store = createStore(
+        rootReducer,
+        applyMiddleware(epicMiddleware)
+    );
+    return store;
+}
+
+
+*/
+
+
+
+//RECIPES 
+
+
+//1 CANCELATION
+const fetchUserEpic = action$ => 
+    action$.ofType(FETCH_USER)
+    .mergeMap(action => 
+        ajax.getJSON(`/api/users/${action.payload}`)
+        .map(response => fetchUserFulfilled(response))
+        .takeUntil(action$.ofType(FETCH_USER_CANCELLED))
+    );
