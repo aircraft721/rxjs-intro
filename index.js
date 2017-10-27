@@ -57,6 +57,24 @@ const button = document.querySelector('button');
 // foo.subscribe(x => console.log(x));
 // foo.subscribe(y => console.log(y));
 
+/*
+
+FROM PROMISE
+
+const myPromise = new Promise((resolve, reject)=>{
+    console.log('promise was created');
+    setTimeout(() => {
+        resolve('Hello from promise');
+    }, 3000)
+});
+
+const source = Rx.Observable.fromPromise(myPromise)
+    .subscribe(x => console.log(x))
+
+*/
+
+
+
 //-----##7 EXAMPLE----- - Return multiple values synchronously
 
 // const foo = Rx.Observable.create((observer) => {
@@ -739,6 +757,7 @@ export default function configureStore(){
 
 //RECIPES 
 
+/*
 
 //1 CANCELATION
 const fetchUserEpic = action$ => 
@@ -748,3 +767,58 @@ const fetchUserEpic = action$ =>
         .map(response => fetchUserFulfilled(response))
         .takeUntil(action$.ofType(FETCH_USER_CANCELLED))
     );
+
+
+*/
+
+
+/*
+
+//CREATE A SECOND OBSERVER TO MANAGE ERRORS IN ASYNC AND SHIELD THE MAIN OBSERVER CHAIN
+
+const rx = Rx.Observable.interval(1000)
+    .switchMap(() => this.http.get(url)
+        .catch(err => Observable.empty())
+    )
+    .subscribe(data => render(data))
+
+
+*/
+
+
+/*
+
+//ERROR HANDLING 
+
+const fetchUserEpic = action$ => 
+    action$.ofType('FETCH_USER')
+        .mergeMap(action => 
+            ajax.getJSON(`/api/users/${action.payload}`)
+            .map(response => fetchUserFulfilled(response))
+            .catch(error => Observable.of({
+                type: 'FETCH_USER_REJECTED'
+            }))
+        )
+
+*/
+
+
+/*
+
+//FETCH DATA WITH AXIOS IN EPIC
+import axios from 'axios';
+
+const fetchUserEpic = action$ => 
+    action$.ofType('fetch_user')
+        .flatMap(() => 
+            Observable.from(axios.get('/api/users/1'))
+            .map(response => ({type: 'fetch_user_done', user: response.data}))
+            .catch(error => Observable.of({type:'fetch_user_error', error}))
+            .startWith({type: 'fetch_user_ing'})
+        )
+
+*/
+
+
+
+
